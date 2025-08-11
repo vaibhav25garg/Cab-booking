@@ -1,0 +1,348 @@
+🔐 Authentication Setup
+Base URL
+http://localhost:8000
+1. Get Authentication Token
+Endpoint: POST /api/auth/token/
+Headers:
+Content-Type: application/json
+Body (raw JSON):
+json{
+    "username": "your_admin_username",
+    "password": "your_admin_password"
+}
+Response:
+json{
+    "token": "your_auth_token_here"
+}
+2. Using Token in Requests
+For all authenticated endpoints, add this header:
+Authorization: Token your_auth_token_here
+
+🛠 API Endpoints Testing
+🚗 CARS API
+1. Get All Cars
+
+Method: GET
+URL: http://localhost:8000/api/cars/
+Headers: None required
+Response:
+
+json{
+    "count": 1,
+    "next": null,
+    "previous": null,
+    "results": [
+        {
+            "id": "car-uuid-here",
+            "seating_capacity": 4,
+            "primary_image": "http://localhost:8000/media/cars/uuid/image.jpg",
+            "image_count": 2,
+            "created_at": "2025-01-15T10:30:00Z"
+        }
+    ]
+}
+2. Create Car with Images
+
+Method: POST
+URL: http://localhost:8000/api/cars/
+Headers:
+Authorization: Token your_auth_token_here
+
+Body: form-data
+
+seating_capacity: 4
+extra_features: ["AC", "GPS", "Music System"]
+uploaded_images: [Select multiple image files]
+
+
+
+3. Get Single Car
+
+Method: GET
+URL: http://localhost:8000/api/cars/{car_id}/
+Response:
+
+json{
+    "id": "car-uuid-here",
+    "seating_capacity": 4,
+    "extra_features": ["AC", "GPS", "Music System"],
+    "images": [
+        {
+            "id": "image-uuid",
+            "image": "http://localhost:8000/media/cars/uuid/image1.jpg",
+            "alt_text": "",
+            "is_primary": true,
+            "order": 1,
+            "created_at": "2025-01-15T10:30:00Z"
+        }
+    ],
+    "primary_image": "http://localhost:8000/media/cars/uuid/image1.jpg",
+    "image_count": 2,
+    "created_at": "2025-01-15T10:30:00Z",
+    "updated_at": "2025-01-15T10:30:00Z"
+}
+4. Add Images to Existing Car
+
+Method: POST
+URL: http://localhost:8000/api/cars/{car_id}/add_images/
+Headers:
+Authorization: Token your_auth_token_here
+
+Body: form-data
+
+images: [Select multiple image files]
+
+
+
+5. Filter Cars
+
+Method: GET
+URL: http://localhost:8000/api/cars/?seating_capacity=4
+URL: http://localhost:8000/api/cars/?search=4
+URL: http://localhost:8000/api/cars/?ordering=-created_at
+
+
+📦 PACKAGES API
+1. Get All Packages
+
+Method: GET
+URL: http://localhost:8000/api/packages/
+
+2. Create Package
+
+Method: POST
+URL: http://localhost:8000/api/packages/
+Headers:
+Authorization: Token your_auth_token_here
+Content-Type: application/json
+
+Body (raw JSON):
+
+json{
+    "package_name": "Kerala Backwaters Tour",
+    "package_category": "romantic",
+    "duration": 5,
+    "location": "Kerala, India"
+}
+3. Get Package Categories
+
+Method: GET
+URL: http://localhost:8000/api/packages/categories/
+Response:
+
+json[
+    {"value": "adventure", "label": "Adventure"},
+    {"value": "family", "label": "Family"},
+    {"value": "romantic", "label": "Romantic"},
+    {"value": "business", "label": "Business"},
+    {"value": "pilgrimage", "label": "Pilgrimage"},
+    {"value": "wildlife", "label": "Wildlife"}
+]
+4. Filter Packages
+
+URL: http://localhost:8000/api/packages/?package_category=romantic
+URL: http://localhost:8000/api/packages/?duration=5
+URL: http://localhost:8000/api/packages/?search=kerala
+
+
+📍 LOCATIONS API
+1. Create Location with Images
+
+Method: POST
+URL: http://localhost:8000/api/locations/
+Headers:
+Authorization: Token your_auth_token_here
+
+Body: form-data
+
+pkg_id: package-uuid-here
+place_name: Alleppey
+detail_summary: Beautiful backwater destination with houseboats
+uploaded_images: [Select image files]
+
+
+
+2. Get Locations by Package
+
+Method: GET
+URL: http://localhost:8000/api/locations/?pkg_id=package-uuid-here
+
+
+⭐ REVIEWS API
+1. Create Review (Public Access)
+
+Method: POST
+URL: http://localhost:8000/api/reviews/
+Body: form-data
+
+customer_name: John Doe
+cust_location: Mumbai, India
+rating: 5
+message_review: Amazing experience! Highly recommended.
+customer_email: john@example.com
+uploaded_images: [Select image files]
+
+
+
+2. Get All Reviews
+
+Method: GET
+URL: http://localhost:8000/api/reviews/
+
+3. Get Review Statistics
+
+Method: GET
+URL: http://localhost:8000/api/reviews/statistics/
+Response:
+
+json{
+    "total_reviews": 25,
+    "average_rating": 4.2,
+    "rating_distribution": {
+        "1_star": 1,
+        "2_star": 2,
+        "3_star": 5,
+        "4_star": 8,
+        "5_star": 9
+    },
+    "verified_reviews": 20
+}
+4. Filter Reviews
+
+URL: http://localhost:8000/api/reviews/?rating=5
+URL: http://localhost:8000/api/reviews/?mail_authenticated_tag=true
+URL: http://localhost:8000/api/reviews/?search=Mumbai
+
+
+📸 Image Upload Testing
+Form-data Setup in Postman
+
+Select Body Tab → form-data
+For single image:
+
+Key: image (type: File)
+Value: Select image file
+
+
+For multiple images:
+
+Key: uploaded_images (type: File)
+Value: Select multiple image files
+
+
+For additional fields:
+
+Key: field_name (type: Text)
+Value: field_value
+
+
+
+Supported Image Formats
+
+JPEG (.jpg, .jpeg)
+PNG (.png)
+GIF (.gif)
+WebP (.webp)
+
+File Size Limits
+
+Maximum file size: 10MB per image
+Recommended: Keep images under 5MB for better performance
+
+
+🚨 Error Handling
+Common HTTP Status Codes
+
+200 OK - Request successful
+201 Created - Resource created successfully
+400 Bad Request - Invalid data provided
+401 Unauthorized - Authentication required
+403 Forbidden - Permission denied
+404 Not Found - Resource not found
+500 Internal Server Error - Server error
+
+Sample Error Responses
+400 Bad Request:
+json{
+    "seating_capacity": ["This field is required."],
+    "uploaded_images": ["No file was submitted."]
+}
+401 Unauthorized:
+json{
+    "detail": "Authentication credentials were not provided."
+}
+403 Forbidden:
+json{
+    "detail": "You do not have permission to perform this action."
+}
+
+📊 Sample Test Data
+Create Sample Car
+json{
+    "seating_capacity": 7,
+    "extra_features": ["AC", "GPS", "Music System", "Leather Seats"]
+}
+Create Sample Package
+json{
+    "package_name": "Goa Beach Paradise",
+    "package_category": "family",
+    "duration": 4,
+    "location": "Goa, India"
+}
+Create Sample Location
+json{
+    "pkg_id": "package-uuid-here",
+    "place_name": "Baga Beach",
+    "detail_summary": "Famous beach known for water sports and nightlife. Perfect for families and adventure seekers."
+}
+Create Sample Review
+json{
+    "customer_name": "Priya Sharma",
+    "cust_location": "Delhi, India",
+    "rating": 5,
+    "message_review": "Absolutely fantastic trip! The package was well-organized and the locations were breathtaking.",
+    "customer_email": "priya.sharma@example.com"
+}
+
+🔧 Postman Collection Setup
+Create Environment Variables
+
+base_url: http://localhost:8000
+auth_token: your_actual_token_here
+
+Pre-request Script for Authentication
+javascriptpm.request.headers.add({
+    key: 'Authorization',
+    value: 'Token ' + pm.environment.get('auth_token')
+});
+Test Scripts Example
+javascriptpm.test("Status code is 200", function () {
+    pm.response.to.have.status(200);
+});
+
+pm.test("Response has data", function () {
+    var jsonData = pm.response.json();
+    pm.expect(jsonData).to.have.property('results');
+});
+
+🎯 Testing Workflow
+
+Setup Environment - Set base_url and get auth token
+Test Authentication - Verify token endpoint works
+Test CRUD Operations - Create, Read, Update, Delete for each model
+Test Image Uploads - Upload single and multiple images
+Test Filters - Verify filtering and search functionality
+Test Permissions - Verify authenticated vs public endpoints
+Test Edge Cases - Invalid data, missing fields, large files
+
+
+📝 Notes
+
+Always use form-data when uploading images
+Token authentication is required for write operations
+Reviews can be created without authentication (public feedback)
+Images are automatically resized and optimized
+UUID fields are automatically generated
+Pagination is enabled by default (20 items per page)
+
+Happy Testing! 🎉
