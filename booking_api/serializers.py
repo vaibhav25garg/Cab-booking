@@ -204,7 +204,7 @@ class CarsDetailListSerializer(serializers.ModelSerializer):
     class Meta:
         model = CarsDetail
         fields = [
-            'id', 'car_name', 'car_description', 'seating_capacity', 
+            'id', 'car_name', 'car_description', 'extra_features' ,'seating_capacity', 
             'primary_image', 'image_count', 'created_at'
         ]
     
