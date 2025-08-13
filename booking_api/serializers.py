@@ -1,5 +1,5 @@
 # ============================================================================
-# booking_api/serializers.py
+# booking_api/serializers.py - Updated with car_name and car_description
 # ============================================================================
 
 from rest_framework import serializers
@@ -29,7 +29,7 @@ class CarsDetailSerializer(serializers.ModelSerializer):
     class Meta:
         model = CarsDetail
         fields = [
-            'id', 'seating_capacity', 'extra_features',
+            'id', 'car_name', 'car_description', 'seating_capacity', 'extra_features',
             'images', 'uploaded_images', 'primary_image', 'image_count',
             'created_at', 'updated_at'
         ]
@@ -196,14 +196,17 @@ class ReviewDetailSerializer(serializers.ModelSerializer):
             ReviewImage.objects.create(review=review, image=image)
         return review
 
-# List serializers (simplified for performance)
+# List serializers (simplified for performance) - UPDATED
 class CarsDetailListSerializer(serializers.ModelSerializer):
     primary_image = serializers.SerializerMethodField()
     image_count = serializers.SerializerMethodField()
     
     class Meta:
         model = CarsDetail
-        fields = ['id', 'seating_capacity', 'primary_image', 'image_count', 'created_at']
+        fields = [
+            'id', 'car_name', 'car_description', 'seating_capacity', 
+            'primary_image', 'image_count', 'created_at'
+        ]
     
     def get_primary_image(self, obj):
         primary = obj.images.filter(is_primary=True).first()

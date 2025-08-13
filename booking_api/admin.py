@@ -1,4 +1,7 @@
-# booking_api/admin.py
+# ============================================================================
+# booking_api/admin.py - Updated with car_name and car_description
+# ============================================================================
+
 from django.contrib import admin
 from django.utils.html import format_html
 from django.utils.safestring import mark_safe
@@ -25,15 +28,15 @@ class CarImageInline(admin.TabularInline):
 
 @admin.register(CarsDetail)
 class CarsDetailAdmin(admin.ModelAdmin):
-    list_display = ['id', 'seating_capacity', 'primary_image_preview', 'image_count', 'created_at']
+    list_display = ['car_name', 'seating_capacity', 'primary_image_preview', 'image_count', 'created_at']
     list_filter = ['seating_capacity', 'created_at']
-    search_fields = ['id', 'seating_capacity']
+    search_fields = ['id', 'car_name', 'car_description', 'seating_capacity']  # Updated search fields
     readonly_fields = ['id', 'created_at', 'updated_at']
     inlines = [CarImageInline]
     
     fieldsets = (
         ('Car Information', {
-            'fields': ('id', 'seating_capacity', 'extra_features')
+            'fields': ('id', 'car_name', 'car_description', 'seating_capacity', 'extra_features')
         }),
         ('Timestamps', {
             'fields': ('created_at', 'updated_at'),
@@ -63,12 +66,12 @@ class CarsDetailAdmin(admin.ModelAdmin):
 class CarImageAdmin(admin.ModelAdmin):
     list_display = ['id', 'car_info', 'image_preview', 'is_primary', 'order', 'created_at']
     list_filter = ['is_primary', 'created_at']
-    search_fields = ['car__id', 'alt_text']
+    search_fields = ['car__car_name', 'car__id', 'alt_text']  # Updated search fields
     list_editable = ['is_primary', 'order']
     readonly_fields = ['image_preview_large']
     
     def car_info(self, obj):
-        return f"{obj.car.seating_capacity} seats"
+        return f"{obj.car.car_name} ({obj.car.seating_capacity} seats)"
     car_info.short_description = "Car"
     
     def image_preview(self, obj):

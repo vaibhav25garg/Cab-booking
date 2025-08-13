@@ -23,8 +23,17 @@ def review_image_upload_path(instance, filename):
     filename = f"{uuid.uuid4()}.{ext}"
     return os.path.join('reviews', str(instance.review.id), filename)
 
+
 class CarsDetail(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    car_name = models.CharField(
+        max_length=100, 
+        help_text="Name/Model of the car (e.g., 'Toyota Innova', 'Maruti Swift')"
+    )
+    car_description = models.TextField(
+        max_length=500,
+        help_text="Detailed description of the car features and specifications"
+    )
     seating_capacity = models.PositiveIntegerField(
         validators=[MinValueValidator(1), MaxValueValidator(50)]
     )
@@ -35,9 +44,11 @@ class CarsDetail(models.Model):
     class Meta:
         db_table = 'cars_detail'
         ordering = ['-created_at']
+        verbose_name = 'Car Detail'
+        verbose_name_plural = 'Car Details'
     
     def __str__(self):
-        return f"Car {self.id} - {self.seating_capacity} seats"
+        return f"{self.car_name} - {self.seating_capacity} seats"
 
 class CarImage(models.Model):
     """Separate model for car images"""
@@ -57,15 +68,18 @@ class CarImage(models.Model):
         db_table = 'car_images'
         ordering = ['order', '-created_at']
         unique_together = ['car', 'order']
+        verbose_name = 'Car Image'
+        verbose_name_plural = 'Car Images'
     
     def __str__(self):
-        return f"Image for {self.car} - Order {self.order}"
+        return f"Image for {self.car.car_name} - Order {self.order}"
     
     def save(self, *args, **kwargs):
         # Ensure only one primary image per car
         if self.is_primary:
             CarImage.objects.filter(car=self.car, is_primary=True).update(is_primary=False)
         super().save(*args, **kwargs)
+
 
 class PackageDetails(models.Model):
     CATEGORY_CHOICES = [

@@ -1,5 +1,5 @@
 # ============================================================================
-# booking_api/views.py
+# booking_api/views.py - Updated with car_name and car_description search
 # ============================================================================
 
 from rest_framework import viewsets, status, filters
@@ -30,8 +30,8 @@ class CarsDetailViewSet(viewsets.ModelViewSet):
     parser_classes = [MultiPartParser, FormParser, JSONParser]
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
     filterset_fields = ['seating_capacity']
-    search_fields = ['seating_capacity']
-    ordering_fields = ['created_at', 'seating_capacity']
+    search_fields = ['car_name', 'car_description', 'seating_capacity']  # Updated search fields
+    ordering_fields = ['created_at', 'seating_capacity', 'car_name']  # Added car_name to ordering
     ordering = ['-created_at']
     
     def get_serializer_class(self):
@@ -89,37 +89,6 @@ class LocationDetailViewSet(viewsets.ModelViewSet):
     filterset_fields = ['pkg_id']
     search_fields = ['place_name', 'detail_summary']
     ordering = ['-created_at']
-
-# class ReviewDetailViewSet(viewsets.ModelViewSet):
-#     queryset = ReviewDetail.objects.all()
-#     serializer_class = ReviewDetailSerializer
-#     parser_classes = [MultiPartParser, FormParser, JSONParser]
-#     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
-#     filterset_fields = ['rating', 'mail_authenticated_tag']
-#     search_fields = ['customer_name', 'cust_location']
-#     ordering_fields = ['created_at', 'rating']
-#     ordering = ['-created_at']
-    
-#     def get_permissions(self):
-#         if self.action in ['create', 'list', 'retrieve']:
-#             return []
-#         return [IsAuthenticated()]
-    
-#     @action(detail=False, methods=['get'])
-#     def statistics(self, request):
-#         total_reviews = self.queryset.count()
-#         avg_rating = self.queryset.aggregate(Avg('rating'))['rating__avg'] or 0
-        
-#         rating_stats = {}
-#         for i in range(1, 6):
-#             rating_stats[f'{i}_star'] = self.queryset.filter(rating=i).count()
-        
-#         return Response({
-#             'total_reviews': total_reviews,
-#             'average_rating': round(avg_rating, 2),
-#             'rating_distribution': rating_stats,
-#             'verified_reviews': self.queryset.filter(mail_authenticated_tag=True).count()
-#         })
 
 class ReviewDetailViewSet(viewsets.ModelViewSet):
     queryset = ReviewDetail.objects.all()
@@ -193,7 +162,7 @@ class ReviewDetailViewSet(viewsets.ModelViewSet):
             review = ReviewDetail.objects.get(id=review_id)
             review.mail_authenticated_tag = True
             review.save()
-            cache.delete(f'veverify_review_{token}')
+            cache.delete(f'verify_review_{token}')
             return Response({'message': 'Review verified successfully'})
 
         return Response({'error': 'Invalid or expired token'}, status=400)
